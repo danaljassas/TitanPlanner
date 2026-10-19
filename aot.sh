@@ -5,10 +5,9 @@ for i in /usr/lib/mono/gac/*/*/*.dll; do sudo mono --aot $i; done
 
 for i in *.dll; do sudo mono --aot $i; done
 
-sudo mono --aot 'MissionPlanner.exe'
+sudo mono --aot 'StarboundPlanner.exe'
 
 
-#gdb --args mono --debug 'MissionPlanner.exe'
+#gdb --args mono --debug 'StarboundPlanner.exe'
 
 #handle SIGXCPU SIG33 SIG35 SIG36 SIG37 SIG38 SIGPWR nostop noprint
-

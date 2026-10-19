@@ -127,9 +127,9 @@ The solution has ~93 projects; treat `ExtLibs/` as the bulk of the real function
   don't treat those as actionable warnings.
 - **`Resources/`** holds icons/images; themes are `*.mpsystheme` files driven by `ThemeManager.cs`.
 
-## TitanPlanner fork notes
+## StarboundPlanner fork notes
 
-This repository is the Titan Dynamics fork of Mission Planner. `CHANGES.md` is the feature-level
+This repository is the StarboundPlanner fork of Mission Planner. `CHANGES.md` is the feature-level
 summary of everything the fork adds over upstream; update it (and `README.md` if user-facing)
 whenever a change lands. `ChangeLog.txt` is upstream's and is not maintained here.
 
@@ -145,11 +145,12 @@ whenever a change lands. `ChangeLog.txt` is upstream's and is not maintained her
   keep its `obj\` / `obj2\` excludes or the Xamarin-generated `FirmwareSelection.xaml.g.cs` is
   compiled twice. Keep `GenerateResourceUsePreserializedResources` on, or `dotnet build`/`dotnet test`
   fail. Both `plugins\` and `Plugins\` exist on disk; the csproj excludes both.
-- **Product identity and data folders.** The app is "TitanPlanner": its own MSI upgrade code and install
-  folder (`wix/Program.cs`) and its own data folders via `Settings.AppConfigName`. On first launch
-  `DataFolderMigration` copies the previous folders (`Settings.PreviousAppConfigNames`, "Mission
-  Planner") into the new ones. The NextVision edition sets these to "TitanPlanner-NextVision" and
-  `{ "TitanPlanner", "Mission Planner" }`, so those lines differ between the two repos by design.
+- **Product identity and data folders.** The app is "StarboundPlanner". Keep the existing MSI upgrade
+  code, installation path, updater URLs/asset names, and file-association IDs so current installs and
+  updates remain compatible. User data lives in folders named by `Settings.AppConfigName`; on first
+  launch, `DataFolderMigration` copies data from the previous `TitanPlanner` and `Mission Planner`
+  folders. The NextVision edition uses "TitanPlanner-NextVision" and
+  `{ "TitanPlanner", "Mission Planner" }`, so those settings differ between the two repos by design.
 - **3D map.** `Controls/Map3D/` is the 3D view (excluded from the LIB build). `Terrain/` streams satellite
   terrain: `TerrainQuadtree` picks tiles by screen-space error, `TileLoader` fetches imagery (through the
   shared GMap cache), samples SRTM (`srtm.GetCell`) and builds meshes on worker threads, and `TerrainEngine`

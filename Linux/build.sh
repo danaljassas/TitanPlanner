@@ -40,25 +40,25 @@ dotnet build MissionPlanner.csproj --configuration Release \
     "-p:MonoPosixPath=$mono_posix" "$@"
 
 app_dir="$source_dir/bin/Release/net461"
-mono "$app_dir/version.exe" "$app_dir/MissionPlanner.exe" > "$app_dir/version.txt"
+mono "$app_dir/version.exe" "$app_dir/StarboundPlanner.exe" > "$app_dir/version.txt"
 cp -- ExtLibs/System.Speech.dll "$app_dir/"
-# NativeLibrary is compiled into MissionPlanner.exe. Map its Linux loader name
+# NativeLibrary is compiled into StarboundPlanner.exe. Map its Linux loader name
 # to the runtime soname so users do not need the libc development symlink.
 sed -i '/<dllmap dll="libdl.so"/d; /<\/configSections>/a\  <dllmap dll="libdl.so" target="libdl.so.2" os="linux" />' \
-    "$app_dir/MissionPlanner.exe.config"
+    "$app_dir/StarboundPlanner.exe.config"
 
 # Source-location logging walks runtime metadata while holding the log4net
 # appender lock. Mono can deadlock against concurrent assembly-load logging.
 # Linux packages omit debug symbols, so keep the logger/thread but skip locations.
-sed -i 's/ (%file:%line)//g' "$app_dir/MissionPlanner.exe.config"
+sed -i 's/ (%file:%line)//g' "$app_dir/StarboundPlanner.exe.config"
 
 # Include a diagnostic that can validate the runtime without a compiler.
 mcs -out:"$app_dir/LinuxSmokeTest.exe" \
     -r:System.Windows.Forms -r:System.Drawing -r:"$app_dir/SkiaSharp.dll" \
-    -r:"$app_dir/MissionPlanner.exe" -r:"$app_dir/Interfaces.dll" \
+    -r:"$app_dir/StarboundPlanner.exe" -r:"$app_dir/Interfaces.dll" \
     -r:"$app_dir/MissionPlanner.Controls.dll" -r:"$app_dir/MissionPlanner.Utilities.dll" \
     -r:"$mono_facades/netstandard.dll" "$linux_dir/SmokeTest.cs"
-cp -- "$app_dir/MissionPlanner.exe.config" "$app_dir/LinuxSmokeTest.exe.config"
+cp -- "$app_dir/StarboundPlanner.exe.config" "$app_dir/LinuxSmokeTest.exe.config"
 
 package_name=MissionPlanner-linux-x86_64
 output_dir="$source_dir/bin/linux"

@@ -78,7 +78,7 @@ namespace wix
             if (args.Length > 1)
                 outputfilename = args[1];
 
-            string exepath = Path.GetFullPath(path) + Path.DirectorySeparatorChar + "MissionPlanner.exe";
+            string exepath = Path.GetFullPath(path) + Path.DirectorySeparatorChar + "StarboundPlanner.exe";
             string version = Assembly.LoadFile(exepath).GetName().Version.ToString();
 
             System.Diagnostics.FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(exepath);
@@ -187,9 +187,9 @@ namespace wix
 <Wix xmlns=""http://schemas.microsoft.com/wix/2006/wi"" xmlns:netfx=""http://schemas.microsoft.com/wix/NetFxExtension"" xmlns:difx=""http://schemas.microsoft.com/wix/DifxAppExtension"" xmlns:iis='http://schemas.microsoft.com/wix/IIsExtension' >
 
 
-    <Product Id=""" + newid + @""" Name=""TitanPlanner"" Language=""1033"" Version=""" + version + @""" Manufacturer=""Michael Oborne"" UpgradeCode=""{DBDDCF07-1D02-4891-93DB-58B79CB92799}"">
+    <Product Id=""" + newid + @""" Name=""StarboundPlanner"" Language=""1033"" Version=""" + version + @""" Manufacturer=""Michael Oborne"" UpgradeCode=""{DBDDCF07-1D02-4891-93DB-58B79CB92799}"">
 
-    <Package Description=""TitanPlanner Installer"" Comments=""TitanPlanner Installer"" Manufacturer=""Michael Oborne"" InstallerVersion=""200"" Compressed=""yes"" />
+    <Package Description=""StarboundPlanner Installer"" Comments=""StarboundPlanner Installer"" Manufacturer=""Michael Oborne"" InstallerVersion=""200"" Compressed=""yes"" />
 
     <Upgrade Id=""{DBDDCF07-1D02-4891-93DB-58B79CB92799}"">
         <UpgradeVersion OnlyDetect=""yes"" Minimum=""" + version + @""" Property=""NEWERVERSIONDETECTED"" IncludeMinimum=""no"" />
@@ -238,7 +238,7 @@ namespace wix
         </Directory>
 
         <Directory Id=""ProgramMenuFolder"">
-            <Directory Id=""ApplicationProgramsFolder"" Name=""TitanPlanner"" />
+            <Directory Id=""ApplicationProgramsFolder"" Name=""StarboundPlanner"" />
         </Directory>
     </Directory>
 
@@ -293,8 +293,8 @@ namespace wix
 
     <DirectoryRef Id=""ApplicationProgramsFolder"">
         <Component Id=""ApplicationShortcut"" Guid=""*"">
-            <Shortcut Id=""ApplicationStartMenuShortcut10"" Name=""TitanPlanner"" Description=""TitanPlanner"" Target=""[INSTALLDIR]MissionPlanner.exe"" WorkingDirectory=""INSTALLDIR"" />
-            <Shortcut Id=""UninstallProduct"" Name=""Uninstall TitanPlanner"" Description=""Uninstalls TitanPlanner"" Target=""[System64Folder]msiexec.exe"" Arguments=""/x [ProductCode]"" />
+            <Shortcut Id=""ApplicationStartMenuShortcut10"" Name=""StarboundPlanner"" Description=""StarboundPlanner"" Target=""[INSTALLDIR]StarboundPlanner.exe"" WorkingDirectory=""INSTALLDIR"" />
+            <Shortcut Id=""UninstallProduct"" Name=""Uninstall StarboundPlanner"" Description=""Uninstalls StarboundPlanner"" Target=""[System64Folder]msiexec.exe"" Arguments=""/x [ProductCode]"" />
             <RegistryValue Root=""HKCU"" Key=""Software\MichaelOborne\TitanPlanner"" Name=""installed"" Type=""integer"" Value=""1"" KeyPath=""yes"" />
 
             <RemoveFolder Id=""dltApplicationProgramsFolder"" Directory=""ApplicationProgramsFolder"" On=""uninstall"" />
@@ -304,7 +304,7 @@ namespace wix
     </DirectoryRef>
 
 
-    <Feature Id=""Complete"" Title=""TitanPlanner"" Level=""1"">
+    <Feature Id=""Complete"" Title=""StarboundPlanner"" Level=""1"">
         <ComponentRef Id=""InstallDirPermissions"" />
 ";
             sw.WriteLine(data);
@@ -331,7 +331,7 @@ namespace wix
             Event=""DoAction"" 
             Value=""LaunchApplication"">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
     </UI>
-    <Property Id=""WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"" Value=""Launch TitanPlanner"" />
+    <Property Id=""WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"" Value=""Launch StarboundPlanner"" />
 
     <!-- Step 3: Include the custom action -->
     <Property Id=""WixShellExecTarget"" Value=""[#" + mainexeid + @"]"" />
@@ -387,7 +387,7 @@ namespace wix
                 no++;
 
 
-                if (filepath.EndsWith("MissionPlanner.exe"))
+                if (filepath.EndsWith("StarboundPlanner.exe"))
                 {
                     mainexeid = "_" + no;
 

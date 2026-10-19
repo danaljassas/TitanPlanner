@@ -743,6 +743,8 @@ namespace MissionPlanner
             }
 
             InitializeComponent();
+            MainMenu.Items.Insert(MainMenu.Items.IndexOf(MenuArduPilot), toolbarLogoSpacer);
+            MainMenu.Layout += CenterToolbarLogo;
 
             //Init Theme table and load BurntKermit as a default
             ThemeManager.thmColor = new ThemeColorTable(); //Init colortable
@@ -757,7 +759,7 @@ namespace MissionPlanner
                 if (File.Exists($"{running_directory}custom.mpsystheme"))
                     Settings.Instance["theme"] = "custom.mpsystheme";
                 else
-                    Settings.Instance["theme"] = "titandynamics.mpsystheme";
+                    Settings.Instance["theme"] = "StarboundPlanner.mpsystheme";
             }
 
             ThemeManager.LoadTheme(Settings.Instance["theme"]);
@@ -1157,12 +1159,6 @@ namespace MissionPlanner
                 this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
             }
 
-            var logoImage = ThemeManager.IsDarkTheme
-                ? Properties.Resources.TD_MP
-                : Properties.Resources.TD_MP_light;
-            MenuArduPilot.Image = new Bitmap(logoImage, (int)(200), 31);
-            MenuArduPilot.Width = MenuArduPilot.Image.Width;
-
             Application.DoEvents();
 
             Comports.Add(comPort);
@@ -1241,9 +1237,19 @@ namespace MissionPlanner
 
             displayicons = icons;
 
-            MainMenu.BackColor = SystemColors.MenuBar;
+            MainMenu.BackColor = ThemeManager.BGColor;
 
             MainMenu.BackgroundImage = displayicons.bg;
+
+            var logoImage = ThemeManager.IsDarkTheme
+                ? Properties.Resources.TD_MP
+                : Properties.Resources.TD_MP_light;
+            var previousLogo = MenuArduPilot.Image;
+            MenuArduPilot.Image = new Bitmap(logoImage, 200, 31);
+            MenuArduPilot.Width = MenuArduPilot.Image.Width + MenuArduPilot.Padding.Horizontal + 8;
+            MenuArduPilot.Text = "Starbound Labs";
+            MenuArduPilot.ToolTipText = "Starbound Labs";
+            previousLogo?.Dispose();
 
             // Use new unified icons with theme recoloring
             MenuFlightData.Image = ThemeManager.RecolorMenuIcon(Properties.Resources.icon_fly);
@@ -1262,6 +1268,38 @@ namespace MissionPlanner
             MenuConfigTune.ForeColor = ThemeManager.TextColor;
             MenuConnect.ForeColor = ThemeManager.TextColor;
             MenuHelp.ForeColor = ThemeManager.TextColor;
+        }
+
+        private readonly ToolStripLabel toolbarLogoSpacer = new ToolStripLabel
+        {
+            AutoSize = false,
+            Alignment = ToolStripItemAlignment.Right,
+            Margin = Padding.Empty,
+            Size = new Size(0, 1)
+        };
+
+        private void CenterToolbarLogo(object sender, LayoutEventArgs e)
+        {
+            int left = MainMenu.DisplayRectangle.Left;
+            int right = MainMenu.DisplayRectangle.Right;
+            foreach (ToolStripItem item in MainMenu.Items)
+            {
+                if (item == MenuArduPilot || item == toolbarLogoSpacer || !item.Available)
+                    continue;
+
+                int width = item.Width + item.Margin.Horizontal;
+                if (item.Alignment == ToolStripItemAlignment.Right)
+                    right -= width;
+                else
+                    left += width;
+            }
+
+            int centeredLeft = (MainMenu.ClientSize.Width - MenuArduPilot.Width) / 2;
+            // Keep navigation and connection controls usable when the window is narrow.
+            int logoLeft = Math.Max(left, centeredLeft);
+            int spacing = Math.Max(0, right - MenuArduPilot.Width - logoLeft);
+            if (toolbarLogoSpacer.Width != spacing)
+                toolbarLogoSpacer.Width = spacing;
         }
 
         void adsb_UpdatePlanePosition(object sender, MissionPlanner.Utilities.adsb.PointLatLngAltHdg adsb)
@@ -4986,7 +5024,7 @@ namespace MissionPlanner
         {
             try
             {
-                System.Diagnostics.Process.Start("https://titandynamics.aero");
+                System.Diagnostics.Process.Start("https://www.starboundlabs.com");
             }
             catch
             {

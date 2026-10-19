@@ -21,7 +21,7 @@ jobs:
     env:
       IS_DEV: ${{ github.ref == 'refs/heads/development' }}
       IS_MASTER: ${{ github.ref == 'refs/heads/master' }}
-      MSI_NAME: TitanPlanner-Installer.msi
+      MSI_NAME: StarboundPlanner-Installer.msi
       ZIP_NAME: TitanPlanner.zip
 
     steps:
@@ -66,7 +66,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MissionPlannerBeta
+          name: StarboundPlannerBeta
           path: bin\Release\net461
 
       - uses: actions/upload-artifact@v4
@@ -104,10 +104,10 @@ jobs:
           mkdir notes
           if [ "$IS_DEV" = true ]; then
             channel=development
-            export RELEASE_TITLE="TitanPlanner $VERSION (development build)"
+            export RELEASE_TITLE="StarboundPlanner $VERSION (development build)"
           else
             channel=master
-            export RELEASE_TITLE="TitanPlanner $VERSION"
+            export RELEASE_TITLE="StarboundPlanner $VERSION"
           fi
           # A re-run of the commit that is already the development build keeps that build's notes
           if [ "$IS_DEV" = true ] && [ "$(git rev-parse -q --verify 'refs/tags/development-build^{commit}')" = "$GITHUB_SHA" ] &&
@@ -141,7 +141,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
-          gh release create "TitanPlanner-$VERSION" --target "$GITHUB_SHA" --latest --title "TitanPlanner $VERSION" \
+          gh release create "TitanPlanner-$VERSION" --target "$GITHUB_SHA" --latest --title "StarboundPlanner $VERSION" \
             --notes-file notes/release-notes.md \
             "$ZIP_NAME" "$MSI_NAME" checksums.txt version.txt notes/ChangeLog.txt
 

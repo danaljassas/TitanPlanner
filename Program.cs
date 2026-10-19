@@ -155,11 +155,10 @@ namespace MissionPlanner
 
         private static void HandleTDEditionUpgrade()
         {
-            // Check for Titan Dynamics edition - if not set, this is a new install or upgrade from original Mission Planner
+            // Initialize StarboundPlanner defaults when no fork-specific settings exist.
             if (Settings.Instance["td_edition"] == null)
             {
-                // Set Titan Dynamics default theme
-                Settings.Instance["theme"] = "titandynamics.mpsystheme";
+                Settings.Instance["theme"] = "StarboundPlanner.mpsystheme";
 
                 // Show tabs by default
                 Settings.Instance["displayParamsTab"] = "true";
@@ -168,6 +167,12 @@ namespace MissionPlanner
                 Settings.Instance["displayInspectorTab"] = "true";
 
                 Settings.Instance["td_edition"] = "true";
+                Settings.Instance.Save();
+            }
+            else if (string.Equals(Settings.Instance["theme"], "titandynamics.mpsystheme",
+                         StringComparison.OrdinalIgnoreCase))
+            {
+                Settings.Instance["theme"] = "StarboundPlanner.mpsystheme";
                 Settings.Instance.Save();
             }
         }
@@ -181,9 +186,9 @@ namespace MissionPlanner
             Program.args = args;
             Console.WriteLine(
                 "If your error is about Microsoft.DirectX.DirectInput, please install the latest directx redist from here http://www.microsoft.com/en-us/download/details.aspx?id=35 \n\n");
-            Console.WriteLine("Debug under mono    MONO_LOG_LEVEL=debug mono MissionPlanner.exe");
+            Console.WriteLine("Debug under mono    MONO_LOG_LEVEL=debug mono StarboundPlanner.exe");
             Console.WriteLine("To fix any filename case issues under mono use    export MONO_IOMAP=drive:case");
-            Console.WriteLine("for pinvoke      MONO_LOG_LEVEL=debug MONO_LOG_MASK=dll mono MissionPlanner.exe");
+            Console.WriteLine("for pinvoke      MONO_LOG_LEVEL=debug MONO_LOG_MASK=dll mono StarboundPlanner.exe");
 
             Console.WriteLine("watch -n 1 ls -l /proc/$(pidof mono)/fd");
             Console.WriteLine("watch -n 1 lsof -p $(pidof mono)");
@@ -261,7 +266,7 @@ namespace MissionPlanner
                 return;
             }
 
-            name = "TitanPlanner";
+            name = Application.ProductName;
 
             try
             {
@@ -332,7 +337,7 @@ namespace MissionPlanner
                 if (File.Exists(Settings.GetRunningDirectory() + "custom.mpsystheme"))
                     Settings.Instance["theme"] = "custom.mpsystheme";
                 else
-                    Settings.Instance["theme"] = "titandynamics.mpsystheme";
+                    Settings.Instance["theme"] = "StarboundPlanner.mpsystheme";
             }
             ThemeManager.LoadTheme(Settings.Instance["theme"]);
 
@@ -341,7 +346,7 @@ namespace MissionPlanner
             string strVersion = File.Exists("version.txt")
                 ? File.ReadAllText("version.txt")
                 : System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            Splash.Text = name + " " + strVersion;
+            Splash.Text = Application.ProductName + " " + strVersion;
             Console.WriteLine("Splash.Show()");
             Splash.Show();
 

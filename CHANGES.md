@@ -1,4 +1,4 @@
-# Mission Planner - Titan Dynamics Edition - Features
+# StarboundPlanner - Features
 
 What this fork adds on top of upstream [ArduPilot/MissionPlanner](https://github.com/ArduPilot/MissionPlanner), by area. It describes how the fork behaves today, not the history of how it got there; for that, use the git log. (`ChangeLog.txt` is upstream's own log.)
 
@@ -6,17 +6,21 @@ What this fork adds on top of upstream [ArduPilot/MissionPlanner](https://github
 
 # Branding & Theming
 
-## Titan Dynamics System Theme
-A new bundled theme (`titandynamics.mpsystheme`) is set as the default for new installs. Theming also covers controls upstream leaves unthemed — `ListBox`, `PropertyGrid`, `MessagesList`, status tab, menu-bar icons, the Splash form, and toast notifications.
+## StarboundPlanner Rebrand
+The application is branded StarboundPlanner. Its new default theme follows Starbound Labs' Drone Light Show Designer: charcoal panels (`#2C2C2C`), raised controls (`#383838`), pale text, and a blue accent (`#1084FE`). Existing TitanPlanner settings and data are migrated into the StarboundPlanner folders on first launch; custom themes and HUD sky/ground colors are preserved. The installer keeps its existing installation and upgrade identities, and the updater retains its legacy `TitanPlanner.zip` asset name for compatibility.
+
+## StarboundPlanner System Theme
+The bundled `StarboundPlanner.mpsystheme` is the default theme. Theming also covers controls upstream leaves unthemed — `ListBox`, `PropertyGrid`, `MessagesList`, status tab, menu-bar icons, the Splash form, and toast notifications.
 
 ## Dark Windows Title Bars
 Native Windows title bars now follow the application theme rather than always being light.
 
 ## New Application Icon, Splash, and Tab Icons
-A new app icon (Titan Dynamics branding), redesigned splash screen, and a fresh icon set for the main top-level tabs in both dark and light variants.
+The toolbar wordmark is centered in the window where space allows using a separate spacer, with image padding to prevent clipping; on smaller windows, navigation and connection controls retain priority.
+The launch executable is `StarboundPlanner.exe`. Its multi-resolution Windows icon, toolbar wordmark, and startup screen use the Starbound Labs artwork from Drone Light Show Designer. Dark and light wordmarks follow theme changes; the startup screen identifies StarboundPlanner and its build version. The main toolbar follows the theme background instead of reverting to the Windows menu color. The main top-level tabs retain the fork's dark and light icon variants.
 
 ## Plane & Copter Default Icons
-Tornado and Proton aircraft are the default rendered icons for plane and copter vehicle classes. Users can also drop in a custom aircraft icon image to override per-vehicle defaults entirely.
+Tornado remains the default plane icon. Quadrotors use the actual Starbound drone top-down image from the website's flight-log map, preserving heading, course, target lines and vehicle IDs. Their default 3D mesh is converted from the same website flight-log viewer's drone model, with real-size geometry and matching orientation. Other vehicle types and custom STL overrides are preserved. Users can also drop in a custom aircraft icon image to override per-vehicle defaults entirely.
 
 ---
 
@@ -283,9 +287,10 @@ Behaviour that differs from upstream because the fork fixed it:
 # Auto-Update Pipeline
 
 ## CI Workflow
-GitHub Actions builds Release and Debug, packages an MSI (`TitanPlanner-Installer.msi`) and zip, computes `checksums.txt` and `version.txt`, and publishes:
+GitHub Actions builds Release and Debug, packages an MSI (`StarboundPlanner-Installer.msi`) and the legacy `TitanPlanner.zip` update asset, computes `checksums.txt` and `version.txt`, and publishes:
+
 - A **`development-build`** prerelease on every push to `development`
-- A **`TitanPlanner-<version>`** stable release on every push to `master`
+- A **StarboundPlanner** stable release on every push to `master` (retaining the `TitanPlanner-<version>` tag for compatibility)
 - Each release's notes list every commit since the previous release on its channel (the previous `development-build`, or the previous `TitanPlanner-*` tag), with the fork's commits first and the commits brought in from upstream in a collapsed section. The same notes are published as the release's `ChangeLog.txt`. `.github/scripts/release-notes.sh <development|master>` previews them locally
 - Upstream's Linux and macOS workflows build here too, but their `linux-latest` / `osxlatest` prereleases are only published from the ArduPilot repository, so this fork's Releases page stays limited to the two channels above
 
@@ -297,12 +302,12 @@ Reads `version.txt` from the channel URL (stable or beta) and compares as `Syste
 # Installation & Data Folders
 
 ## Its Own Product
-The MSI installs **TitanPlanner** as a product of its own: `Program Files\TitanPlanner`, a TitanPlanner Start-menu folder and uninstall entry, and its own Windows upgrade code. Log file associations use `TitanPlanner.*` ProgIds, and the window title reads "TitanPlanner".
+The MSI registers **StarboundPlanner** as a Windows product and uses that name for the Start menu, uninstall entry, and window title. To upgrade existing installs in place, the installation directory (`Program Files\TitanPlanner`), Windows upgrade code, and `TitanPlanner.*` file-association ProgIds remain unchanged.
 
-Older TitanPlanner installers used the identity of stock ArduPilot Mission Planner. The TitanPlanner MSI removes such an install only when it is TitanPlanner, recognised by `TitanDynamics.mpsystheme` in `Program Files (x86)\Mission Planner`, so upgrading from an older TitanPlanner needs no manual uninstall while a stock Mission Planner install is left alone. An older TitanPlanner installed to a custom folder is not detected and stays installed alongside. Nothing removes TitanPlanner except its own uninstaller: stock Mission Planner's installer and the NextVision edition install alongside it.
+Older TitanPlanner installers used the identity of stock ArduPilot Mission Planner. The StarboundPlanner MSI removes such an install only when it is a TitanPlanner install, recognised by the retained `TitanDynamics.mpsystheme` file in `Program Files (x86)\Mission Planner`, so upgrading from an older TitanPlanner needs no manual uninstall while a stock Mission Planner install is left alone. An older TitanPlanner installed to a custom folder is not detected and stays installed alongside. Nothing removes StarboundPlanner except its own uninstaller: stock Mission Planner's installer and the NextVision edition install alongside it.
 
 ## Its Own Data Folders
-Settings, logs, map tiles, offline maps, elevation data and caches live in `ProgramData\TitanPlanner` and `Documents\TitanPlanner` instead of the `Mission Planner` folders shared with stock Mission Planner. On first launch TitanPlanner copies everything over from the `Mission Planner` folders: settings and configuration profiles before startup continues, and the rest (which can be gigabytes of map tiles) on a low-priority background thread that resumes on the next launch if interrupted. Nothing is moved or deleted, files already in the new folders are never overwritten, and if the disk lacks space for the copy it says so and retries on a later launch.
+Settings, logs, map tiles, offline maps, elevation data and caches live in `ProgramData\StarboundPlanner` and `Documents\StarboundPlanner` instead of the folders shared with stock Mission Planner. On first launch StarboundPlanner copies settings and data from the old `TitanPlanner` folders first, then the `Mission Planner` folders. Settings and configuration profiles are copied before startup continues; larger files such as map tiles copy on a low-priority background thread that resumes on the next launch if interrupted. Nothing is moved or deleted, files already in the new folders are never overwritten, and if the disk lacks space for the copy it says so and retries on a later launch.
 
 ---
 

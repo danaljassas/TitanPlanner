@@ -18,9 +18,13 @@ namespace MissionPlanner
                 ? File.ReadAllText("version.txt").Trim()
                 : Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            TXT_version.Text = "Version: Titan " + strVersion;
+            TXT_version.Text = Application.ProductName + Environment.NewLine + "Version " + strVersion;
+            BackColor = ThemeManager.BGColor;
+            TXT_version.ForeColor = ThemeManager.TextColor;
+            brandLogo.Image = ThemeManager.IsDarkTheme
+                ? Properties.Resources.TD_MP
+                : Properties.Resources.TD_MP_light;
 
-            // Use theme color for bottom line instead of hardcoded green
             label1.ForeColor = ThemeManager.BannerColor2;
 
             Console.WriteLine(strVersion);
