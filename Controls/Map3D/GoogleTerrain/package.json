@@ -1,0 +1,13 @@
+{
+  "name": "starboundplanner-google-terrain",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": { "build": "node build.cjs" },
+  "dependencies": {
+    "three": "0.182.0",
+    "3d-tiles-renderer": "0.5.3"
+  },
+  "devDependencies": {
+    "webpack": "5.106.2"
+  }
+}

@@ -103,6 +103,23 @@ namespace MissionPlanner.Controls
             _stlLoader.CustomSTLPath = _settings.StlPath;
 
             InitializeComponent();
+            var googleTerrain = new GoogleTerrainView(this, () =>
+            {
+                foreach (Control child in Controls)
+                    if (child is GoogleTerrainView)
+                        child.Visible = false;
+                MarkActive();
+                Invalidate();
+            }) { Dock = DockStyle.Fill };
+            var googleButton = new Button { Text = "Google 3D terrain", AutoSize = true, Location = new Point(50, 4) };
+            googleButton.Click += (s, e) =>
+            {
+                googleTerrain.Visible = true;
+                googleTerrain.BringToFront();
+            };
+            Controls.Add(googleButton);
+            Controls.Add(googleTerrain);
+            googleTerrain.BringToFront();
             MouseMove += OnMouseMove;
             MouseDown += OnMouseDown;
             MouseUp += OnMouseUp;
@@ -278,6 +295,9 @@ namespace MissionPlanner.Controls
 
         public void doPaint()
         {
+            foreach (Control child in Controls)
+                if (child is GoogleTerrainView && child.Visible)
+                    return;
             if (_disposed || IsDisposed || DesignMode || _glFailed || Context == null || Width <= 0 || Height <= 0)
                 return;
 

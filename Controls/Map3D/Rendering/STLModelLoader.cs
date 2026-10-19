@@ -19,9 +19,23 @@ namespace MissionPlanner.Controls
         private bool _isLoaded = false;
         private MAVLink.MAV_TYPE? _loadedMavType = null;
         private string _customSTLPath = "";
+        private static readonly Lazy<byte[]> StarboundTriangleColors = new Lazy<byte[]>(() =>
+        {
+            using (var stream = typeof(STLModelLoader).Assembly.GetManifestResourceStream("MissionPlanner.StarboundDrone.colors"))
+            {
+                if (stream == null)
+                    throw new InvalidDataException("Starbound drone material colors are missing.");
+                using (var data = new MemoryStream())
+                {
+                    stream.CopyTo(data);
+                    return data.ToArray();
+                }
+            }
+        });
 
         public List<float> Vertices => _vertices;
         public List<float> Normals => _normals;
+        public byte[] TriangleColors { get; private set; }
         public int VertexCount => _vertices?.Count / 3 ?? 0;
         public bool IsLoaded => _isLoaded;
         public MAVLink.MAV_TYPE? LoadedMavType => _loadedMavType;
@@ -79,6 +93,7 @@ namespace MissionPlanner.Controls
                     _normals = parsed.Item2;
                     if (!usingCustomSTL)
                         _loadedMavType = currentMavType;
+                    LoadMaterialColors(usingCustomSTL, currentMavType);
                     _isLoaded = true;
                     return true;
                 }
@@ -101,6 +116,7 @@ namespace MissionPlanner.Controls
                 }
 
                 ParseSTL(stlContent);
+                LoadMaterialColors(usingCustomSTL, currentMavType);
                 lock (_parsedModels)
                     _parsedModels[key] = Tuple.Create(_vertices, _normals);
                 _isLoaded = true;
@@ -111,6 +127,16 @@ namespace MissionPlanner.Controls
                 MessageBox.Show("Error loading STL: " + ex.Message, "STL Load Error");
                 return false;
             }
+        }
+
+        private void LoadMaterialColors(bool usingCustomSTL, MAVLink.MAV_TYPE mavType)
+        {
+            TriangleColors = !usingCustomSTL && mavType == MAVLink.MAV_TYPE.QUADROTOR
+                ? StarboundTriangleColors.Value
+                : null;
+            // Three RGB bytes per triangle equal the number of vertices.
+            if (TriangleColors != null && TriangleColors.Length != VertexCount)
+                throw new InvalidDataException("Starbound drone material colors do not match the model triangles.");
         }
 
         /// <summary>

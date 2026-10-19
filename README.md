@@ -45,9 +45,19 @@ The updater builds from source alongside the app. Release maintainers with the o
 
 ### 3D Map
 
-On **Flight Data**, tick **3D Map** beside **Params** above the map to open the terrain viewer below it. The gear button in the viewer opens camera, vehicle scale/color, and custom STL settings. With a connected vehicle, drag to orbit, use the mouse wheel to change camera distance, and double-click to reset the orbit angle.
+On **Flight Data**, press the blue **3D Map** toggle in the map's top-left toolbar, beside **Tools** and **Propagation**, to split the map area horizontally: 2D above, 3D below. The 3D viewer's controls sit over the map so both map panes meet directly; drag the divider to resize either half and untick the toggle to return to the full 2D map. Tuning and parameter panels remain independent. The Tools 3D Map window uses the same viewer.
 
-Quadrotors use the Starbound website flight-log viewer's top-down drone image on the 2D map and its drone geometry in 3D. The embedded STL is converted from that viewer's `public/models/drone.glb`, centered and oriented for the existing millimetre-based renderer. STL preserves geometry, not the website's textures/materials; the 3D vehicle uses the color selected in 3D settings. Other vehicle types and custom STL overrides are unchanged.
+The 3D viewer opens Google Photorealistic 3D Tiles using the Edge WebView2 runtime and locally bundled Three.js / 3D Tiles Renderer JS. It has no Cesium library, ion service, account, or branding. This affects only the 3D view, not the 2D map. It requires internet access, Google Maps Platform billing, and a key with Map Tiles API access. Supply `STARBOUND_GOOGLE_MAP_TILES_API_KEY` in the application's environment, or a current-user DPAPI-encrypted UTF-8 key at `%LOCALAPPDATA%\StarboundPlanner\GoogleMapsApiKey.bin`; never commit API keys. Google and imagery-provider attribution stays visible in the viewer. Loading/API failures are displayed rather than silently substituted with other terrain.
+
+Use **Follow / reset** in Google mode to follow the vehicle again after panning. The Google view shows the colored Starbound quadrotor; select **Native 3D** in the on-map controls for the original mission/ADS-B overlays, custom STL models, and terrain tools. Use the **Google 3D terrain** button in native mode to return. The viewer starts in Google mode. In native mode, the gear button opens camera, vehicle scale/color, and custom STL settings. With a connected vehicle, drag to orbit, use the mouse wheel to change camera distance, and double-click to reset the orbit angle.
+The model has a red-orange direction arrow driven by telemetry yaw (north at 0 degrees, east at 90), independent of the camera orbit. It scales with the model and sits beneath it, with normal depth testing so it cannot draw over the canopy.
+
+**Drone size** offers automatic screen-size scaling or real-size/10x/25x/50x/100x presets. **Orbit** rotates around the drone through -180 to +180 degrees; **Zoom** and the mouse wheel smoothly change camera distance over a logarithmic 3-3000 m range. Telemetry position/attitude and camera distance are interpolated rather than snapped. The live/log vehicle model uses current telemetry directly and remains visible even when the connection reports a generic vehicle type.
+
+To rebuild the local renderer bundle, run `npm install` then `npm run build` in `Controls\Map3D\GoogleTerrain`. The generated `*.bundle.js` files and dependency license notices ship with the app; no Node.js runtime is needed to run StarboundPlanner.
+
+Quadrotors use the Starbound website flight-log viewer's top-down drone image on the 2D map and its drone geometry in 3D. The embedded STL is converted from that viewer's `public/models/drone.glb`, centered and oriented for the existing millimetre-based renderer. A companion material-color resource preserves the white canopy, grey propellers, black frame, and original hardware colors instead of applying the single vehicle tint. Other vehicle types and custom STL overrides still use the color selected in 3D settings.
+The companion resource stores one RGB triplet per non-degenerate STL triangle in source primitive order. Colors come from the GLB base-color factors, with its generic `Steel - Satin` canopy assignment corrected to white (`245,245,246`).
 
 ### Linux (Mono)
 

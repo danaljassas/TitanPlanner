@@ -20,6 +20,7 @@ The toolbar wordmark is centered in the window where space allows using a separa
 The launch executable is `StarboundPlanner.exe`. Its multi-resolution Windows icon, toolbar wordmark, and startup screen use the Starbound Labs artwork from Drone Light Show Designer. Dark and light wordmarks follow theme changes; the startup screen identifies StarboundPlanner and its build version. The main toolbar follows the theme background instead of reverting to the Windows menu color. The main top-level tabs retain the fork's dark and light icon variants.
 
 ## Plane & Copter Default Icons
+The default Starbound 3D drone preserves its original per-part colors (white canopy, grey propellers and black frame), independent of the single vehicle-color setting. Other vehicle models retain their configurable tint.
 Tornado remains the default plane icon. Quadrotors use the actual Starbound drone top-down image from the website's flight-log map, preserving heading, course, target lines and vehicle IDs. Their default 3D mesh is converted from the same website flight-log viewer's drone model, with real-size geometry and matching orientation. Other vehicle types and custom STL overrides are preserved. Users can also drop in a custom aircraft icon image to override per-vehicle defaults entirely.
 
 ---
@@ -50,6 +51,13 @@ No Russian-localized HUD variant and no time readout; the CPU message and link s
 ---
 
 # 3D Map (Map3D)
+
+## Google Photorealistic Terrain & Split Map
+The **3D Map** toggle is a blue, theme-colored button in the map's top-left toolbar, between **Propagation** and **Double-click Fly to Here**, rather than a checkbox in the bottom status bar. It opens the 3D viewer in the lower half of the same map area.
+Google 3D actions share the viewer's on-map controls instead of a separate toolbar, leaving the 2D and 3D map panes directly adjacent.
+The Tools 3D Map viewer and the Flight Data 3D view open Google Photorealistic 3D Tiles, using WebView2 with locally bundled Three.js / 3D Tiles Renderer JS (no Cesium or ion), visible Google imagery attribution, and an independently configured local API key.
+Drone-size presets (Auto, real size, 10x-100x), an orbit slider, and smooth logarithmic distance controls make the colored Starbound model easy to see. Telemetry pose and camera distance are smoothly interpolated; the live/log model reads position directly from telemetry, including generic vehicle-type connections. Google terrain is confined to the 3D viewer; the 2D map is unchanged. Flight Data's **3D Map** toggle divides the map area into 2D above and 3D below with a draggable divider, independently of tuning/parameters. The **Native 3D** button retains access to existing overlays, custom models and native terrain tools. API/network failures are shown explicitly.
+A red-orange heading arrow sits beneath the drone with normal depth testing, follows telemetry yaw independently of camera orbit, and scales with the drone model. Telemetry pose and camera distance are smoothly interpolated; the live/log model reads position directly from telemetry, including generic vehicle-type connections. Google terrain is confined to the 3D viewer; the 2D map is unchanged. Flight Data's **3D Map** toggle divides the map area into 2D above and 3D below with a draggable divider, independently of tuning/parameters. The **Native 3D** button retains access to existing overlays, custom models and native terrain tools. API/network failures are shown explicitly.
 
 ## Real-Time Vehicle Rendering
 The connected vehicle renders in 3D with default STL models per MAV type (plane, quadplane, copter, rover, boat, sub, tricopter, etc.) in correct colours, over terrain drawn out to just past the horizon (30–150 km depending on altitude). The model is uploaded to the GPU once and lit in a shader.

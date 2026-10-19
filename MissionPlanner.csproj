@@ -126,6 +126,10 @@
     <Reference Include="System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System.Web.Extensions" />
     <ProjectReference Include="Updater\Updater.csproj" />
+    <EmbeddedResource Include="Resources\StarboundDrone.colors" LogicalName="MissionPlanner.StarboundDrone.colors" />
+    <Content Include="Controls\Map3D\GoogleTerrain\index.html;Controls\Map3D\GoogleTerrain\*.bundle.js;Controls\Map3D\GoogleTerrain\StarboundDrone.glb;Controls\Map3D\GoogleTerrain\*.LICENSE.txt" CopyToOutputDirectory="PreserveNewest">
+      <Link>GoogleTerrain\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="ExtLibs\7zip\7zip.csproj" />

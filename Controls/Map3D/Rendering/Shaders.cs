@@ -87,6 +87,7 @@ void main(void) {
         public const string LitVertex = @"
 attribute vec3 Position;
 attribute vec3 Normal;
+attribute vec3 MaterialColor;
 uniform mat4 Model;
 uniform mat4 ModelView;
 uniform mat4 Projection;
@@ -96,7 +97,7 @@ varying vec4 vColor;
 void main(void) {
     vec3 n = normalize((Model * vec4(Normal, 0.0)).xyz);
     float light = min(1.0, 0.3 + 0.7 * max(dot(n, LightDirection), 0.0));
-    vColor = vec4(BaseColor.rgb * light, BaseColor.a);
+    vColor = vec4(MaterialColor * BaseColor.rgb * light, BaseColor.a);
     gl_Position = Projection * ModelView * vec4(Position, 1.0);
 }
 ";

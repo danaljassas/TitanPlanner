@@ -400,7 +400,7 @@ namespace MissionPlanner.GCSViews
                 Orientation = Orientation.Horizontal,
                 FixedPanel = FixedPanel.Panel2,
                 Panel2Collapsed = true,
-                SplitterWidth = 4,
+                SplitterWidth = 2,
                 Name = "map3DSplitContainer"
             };
 
@@ -418,34 +418,36 @@ namespace MissionPlanner.GCSViews
 
             map3DSplitContainer.Panel1.Resize += splitContainer1_Panel2_Resize;
 
-            // Host for 3D map in the bottom area (shared with params/tuning)
+            // The 3D viewer shares the map area, not the tuning/parameters panel.
             map3DHost = new Panel { Dock = DockStyle.Fill, Visible = false, Name = "map3DHost" };
-            splitContainer2.Panel2.Controls.Add(map3DHost);
+            map3DSplitContainer.Panel2.Controls.Add(map3DHost);
         }
 
-        private void Add3DMapCheckbox()
+        private void Add3DMapCheckbox(Point location)
         {
             CB_3dmap = new CheckBox
             {
                 Text = "3D Map",
-                AutoSize = true
+                Name = "CB_3dmap",
+                Appearance = Appearance.Button,
+                FlatStyle = FlatStyle.Flat,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(70, 23),
+                Location = location,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                AccessibleName = "Toggle split 3D map"
             };
+            CB_3dmap.FlatAppearance.BorderColor = ThemeManager.ButBorder;
+            CB_3dmap.FlatAppearance.BorderSize = 1;
+            CB_3dmap.FlatAppearance.CheckedBackColor = ThemeManager.ButBG;
+            CB_3dmap.FlatAppearance.MouseOverBackColor = ThemeManager.ButBG;
             CB_3dmap.CheckedChanged += CB_3dmap_CheckedChanged;
 
-            panel1.Controls.Add(CB_3dmap);
-            Position3DMapCheckbox();
-            panel1.Resize += (s, e) => Position3DMapCheckbox();
-
-            // Restore saved state
-        }
-
-        private void Position3DMapCheckbox()
-        {
-            if (CB_3dmap == null || CB_params == null || CHK_autopan == null)
-                return;
-
-            CB_3dmap.Location = new Point(CB_params.Right + 10, CB_params.Top);
-            CHK_autopan.Location = new Point(CB_3dmap.Right + 10, CHK_autopan.Top);
+            MapContentPanel.Controls.Add(CB_3dmap);
+            ThemeManager.ApplyThemeTo(CB_3dmap);
+            CB_3dmap.BackColor = ThemeManager.ButBG;
+            CB_3dmap.ForeColor = ThemeManager.ButtonTextColor;
+            CB_3dmap.BringToFront();
         }
 
         private void SaveSplitRatio(SplitContainer split, string settingsKey)
@@ -510,7 +512,6 @@ namespace MissionPlanner.GCSViews
 
             InitializeComponent();
             MoveMapControlsAboveTuning();
-            Add3DMapCheckbox();
 
             log.Info("Components Done");
 
@@ -770,6 +771,7 @@ namespace MissionPlanner.GCSViews
             MapContentPanel.Controls.Add(btnPropagation);
             btnPropagation.BringToFront();
             btnPropagation.Location = new Point(70 + btnTools.Width + 5, 25);
+            Add3DMapCheckbox(new Point(btnPropagation.Right + 5, btnPropagation.Top));
 
             // Add double-click fly to here checkbox (declare first so it can be referenced in 3D map handler)
             // Load setting from config (default to true for fresh installs)
@@ -792,7 +794,7 @@ namespace MissionPlanner.GCSViews
             // Add checkbox to map panel
             MapContentPanel.Controls.Add(chkDoubleClickFlyToHere);
             chkDoubleClickFlyToHere.BringToFront();
-            chkDoubleClickFlyToHere.Location = new Point(70 + btnTools.Width + 5 + btnPropagation.Width + 5, 28);
+            chkDoubleClickFlyToHere.Location = new Point(CB_3dmap.Right + 5, 28);
 
             // Add double-click handler for map (but not on zoom buttons)
             gMapControl1.DoubleClick += (s, e) =>
@@ -2563,7 +2565,6 @@ namespace MissionPlanner.GCSViews
             if (CB_tuning.Checked)
             {
                 if (CB_params.Checked) CB_params.Checked = false;
-                if (CB_3dmap.Checked) CB_3dmap.Checked = false;
             }
             Settings.Instance["CB_tuning"] = CB_tuning.Checked.ToString();
             UpdateSplitContainerLayout();
@@ -2574,7 +2575,6 @@ namespace MissionPlanner.GCSViews
             if (CB_params.Checked)
             {
                 if (CB_tuning.Checked) CB_tuning.Checked = false;
-                if (CB_3dmap.Checked) CB_3dmap.Checked = false;
             }
             Settings.Instance["CB_params"] = CB_params.Checked.ToString();
             UpdateSplitContainerLayout();
@@ -2582,11 +2582,6 @@ namespace MissionPlanner.GCSViews
 
         private void CB_3dmap_CheckedChanged(object sender, EventArgs e)
         {
-            if (CB_3dmap.Checked)
-            {
-                if (CB_tuning.Checked) CB_tuning.Checked = false;
-                if (CB_params.Checked) CB_params.Checked = false;
-            }
             Settings.Instance["CB_3dmap"] = CB_3dmap.Checked.ToString();
             Toggle3DMap(CB_3dmap.Checked);
             UpdateSplitContainerLayout();
@@ -2642,6 +2637,10 @@ namespace MissionPlanner.GCSViews
                     map3DHost.Controls.Clear();
                     map3DHost.Controls.Add(map3DControl);
                     map3DHost.Visible = true;
+                    map3DSplitContainer.Panel2Collapsed = false;
+                    int available = map3DSplitContainer.ClientSize.Height - map3DSplitContainer.SplitterWidth;
+                    if (available >= map3DSplitContainer.Panel1MinSize + map3DSplitContainer.Panel2MinSize)
+                        map3DSplitContainer.SplitterDistance = available / 2;
                 }
             }
             else
@@ -2651,6 +2650,7 @@ namespace MissionPlanner.GCSViews
                 {
                     map3DHost.Controls.Clear();
                     map3DHost.Visible = false;
+                    map3DSplitContainer.Panel2Collapsed = true;
                 }
             }
         }
@@ -2693,27 +2693,12 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            if (map3DChecked)
+            if (map3DChecked && map3DHost != null)
             {
-                splitContainer1.Panel2Collapsed = false;
-                splitContainer2.Panel1Collapsed = true;
-                splitContainer2.Panel2Collapsed = false;
-
-                // Show only the 3D host
-                if (configRawParams2 != null)
-                    configRawParams2.Visible = false;
-                if (zg1 != null)
-                    zg1.Visible = false;
-                if (map3DHost != null)
-                {
-                    map3DHost.Visible = true;
-                    map3DHost.BringToFront();
-                }
-
-                ZedGraphTimer.Enabled = false;
-                ZedGraphTimer.Stop();
+                map3DHost.Visible = true;
+                map3DHost.BringToFront();
             }
-            else if (tuningChecked || paramsChecked)
+            if (tuningChecked || paramsChecked)
             {
                 splitContainer1.Panel2Collapsed = false;
                 splitContainer2.Panel1Collapsed = !tuningChecked;

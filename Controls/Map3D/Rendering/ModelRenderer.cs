@@ -20,6 +20,7 @@ namespace MissionPlanner.Controls.Scene3D
         int _vertexCount;
         List<float> _uploadedVertices;
         string _failedKey;
+        bool _hasMaterialColors;
 
         public ModelRenderer(STLModelLoader loader)
         {
@@ -47,14 +48,17 @@ namespace MissionPlanner.Controls.Scene3D
             _program.SetMatrix("ModelView", ref modelView);
             _program.SetMatrix("Model", ref model);
             _program.SetVector3("LightDirection", LightX / lightLength, LightY / lightLength, LightZ / lightLength);
-            _program.SetColor("BaseColor", color.R / 255f, color.G / 255f, color.B / 255f, 1);
+            _program.SetColor("BaseColor", _hasMaterialColors ? 1 : color.R / 255f,
+                _hasMaterialColors ? 1 : color.G / 255f, _hasMaterialColors ? 1 : color.B / 255f, 1);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            _program.Pointer("Position", 3, 6, 0);
-            _program.Pointer("Normal", 3, 6, 3);
+            _program.Pointer("Position", 3, 9, 0);
+            _program.Pointer("Normal", 3, 9, 3);
+            _program.Pointer("MaterialColor", 3, 9, 6);
             GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexCount);
             _program.DisablePointer("Position");
             _program.DisablePointer("Normal");
+            _program.DisablePointer("MaterialColor");
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
@@ -78,15 +82,21 @@ namespace MissionPlanner.Controls.Scene3D
             var vertices = _loader.Vertices;
             var normals = _loader.Normals;
             int count = vertices.Count / 3;
-            var interleaved = new float[count * 6];
+            var colors = _loader.TriangleColors;
+            _hasMaterialColors = colors != null;
+            var interleaved = new float[count * 9];
             for (int i = 0; i < count; i++)
             {
-                interleaved[i * 6] = vertices[i * 3];
-                interleaved[i * 6 + 1] = vertices[i * 3 + 1];
-                interleaved[i * 6 + 2] = vertices[i * 3 + 2];
-                interleaved[i * 6 + 3] = normals[i * 3];
-                interleaved[i * 6 + 4] = normals[i * 3 + 1];
-                interleaved[i * 6 + 5] = normals[i * 3 + 2];
+                interleaved[i * 9] = vertices[i * 3];
+                interleaved[i * 9 + 1] = vertices[i * 3 + 1];
+                interleaved[i * 9 + 2] = vertices[i * 3 + 2];
+                interleaved[i * 9 + 3] = normals[i * 3];
+                interleaved[i * 9 + 4] = normals[i * 3 + 1];
+                interleaved[i * 9 + 5] = normals[i * 3 + 2];
+                int triangleColor = i / 3 * 3;
+                interleaved[i * 9 + 6] = colors == null ? 1 : colors[triangleColor] / 255f;
+                interleaved[i * 9 + 7] = colors == null ? 1 : colors[triangleColor + 1] / 255f;
+                interleaved[i * 9 + 8] = colors == null ? 1 : colors[triangleColor + 2] / 255f;
             }
 
             if (_vbo == 0)
